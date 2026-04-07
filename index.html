@@ -1,6 +1,9 @@
 
 <!doctype html>
 <html lang="pt-BR">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -238,7 +241,44 @@ l_modo_horario.onchange=updateHorarioUI;
 salvarLancamentoBtn.onclick=()=>{if(!l_aluno.value)return alert("Selecione o aluno.");if(!l_data.value)return alert("Informe a data completa.");const a=alunoById(l_aluno.value);const horario=l_modo_horario.value==="padrao"?(a?.horarioPadrao||l_horario_padrao.value):horarioManualTexto();const reg={id:state.editandoRegistroId||uid(),alunoId:l_aluno.value,data:l_data.value,turno:l_turno.value,horario,observacao:l_obs.value};if(state.editandoRegistroId)state.registros=state.registros.map(r=>r.id===state.editandoRegistroId?reg:r);else state.registros.push(reg);state.editandoRegistroId="";salvarLancamentoBtn.textContent="Salvar atendimento";l_obs.value="";save();r_aluno.value=l_aluno.value;renderAll()};
 r_tipo.onchange=()=>{r_mes_wrap.classList.toggle("hidden",r_tipo.value!=="mensal");r_ano_wrap.classList.toggle("hidden",r_tipo.value!=="anual");renderRelatorio()};
 [r_aluno,r_mes,r_ano,r_incluir_cpf,r_incluir_cnpj].forEach(el=>el.onchange=renderRelatorio);
-imprimirBtn.onclick=()=>window.print();pdfBtn.onclick=()=>window.print();exportarBtn.onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="controle-acompanhamento-escolar.json";a.click();URL.revokeObjectURL(url)};
+imprimirBtn.onclick=()=>window.print();pdfBtn.onclick = async () => {
+  const { jsPDF } = window.jspdf;
+
+  const elemento = document.querySelector(".card-report");
+
+  const canvas = await html2canvas(elemento, {
+    scale: 2,
+    useCORS: true
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  const pageWidth = 210;
+  const pageHeight = 297;
+
+  const imgWidth = pageWidth;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  let position = 0;
+
+  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+
+  // quebra automática de página se necessário
+  if (imgHeight > pageHeight) {
+    let alturaRestante = imgHeight;
+
+    while (alturaRestante > pageHeight) {
+      position = position - pageHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      alturaRestante -= pageHeight;
+    }
+  }
+
+  pdf.save("relatorio-completo.pdf");
+};exportarBtn.onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="controle-acompanhamento-escolar.json";a.click();URL.revokeObjectURL(url)};
 load();updateHorarioUI();renderAll();
 </script>
   
