@@ -196,6 +196,16 @@ function modoEdicaoPerfil(){
     </div>
   `;
 }
+function salvarPerfil(){
+  state.monitora.nome = $("m_nome").value;
+  state.monitora.cpf = $("m_cpf").value;
+  state.monitora.cnpj = $("m_cnpj").value;
+  state.monitora.telefone = $("m_telefone").value;
+  state.monitora.email = $("m_email").value;
+
+  save();
+  preencherPerfil();
+}
   function coletarPerfil(){state.monitora.nome=$("m_nome").value;state.monitora.cpf=m_cpf.value;state.monitora.cnpj=m_cnpj.value;state.monitora.telefone=m_telefone.value;state.monitora.email=m_email.value;save();renderRelatorio()}
 function resetAlunoForm(){state.editandoAlunoId="";a_nome.value="";a_escola.value="";a_serie.value="";a_turma.value="";a_nascimento.value="";a_turno.value="Manhã";a_horario.value="08:00 às 12:00";a_responsavel.value="";a_numero.value="";a_ativo.value="sim";a_obs.value="";a_foto_input.value="";a_foto_preview.classList.add("hidden");a_foto_preview.src="";cancelarEdicaoBtn.classList.add("hidden");salvarAlunoBtn.textContent="Salvar aluno"}
 function preencherAlunoForm(a){state.editandoAlunoId=a.id;a_nome.value=a.nome||"";a_escola.value=a.escola||"";a_serie.value=a.serie||"";a_turma.value=a.turma||"";a_nascimento.value=a.dataNascimento||"";a_turno.value=a.turnoPadrao||"Manhã";a_horario.value=a.horarioPadrao||"";a_responsavel.value=a.nomeResponsavel||"";a_numero.value=a.numeroResponsavel||"";a_ativo.value=a.ativo?"sim":"nao";a_obs.value=a.observacoesGerais||"";a.foto?(a_foto_preview.src=a.foto,a_foto_preview.classList.remove("hidden")):a_foto_preview.classList.add("hidden");cancelarEdicaoBtn.classList.remove("hidden");salvarAlunoBtn.textContent="Atualizar aluno"}
