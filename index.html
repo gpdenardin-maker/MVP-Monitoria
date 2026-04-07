@@ -169,8 +169,8 @@ function preencherPerfil(){
         <p><strong>CPF:</strong> ${state.monitora.cpf || "-"}</p>
         <p><strong>CNPJ:</strong> ${state.monitora.cnpj || "-"}</p>
 
-        ${state.monitora.foto ? `<img src="${state.monitora.foto}" class="preview">` : ""}
-        ${state.monitora.assinatura ? `<img src="${state.monitora.assinatura}" class="signature">` : ""}
+        ${state.monitora.foto ? `<img src="${state.monitora.foto}" class="preview">` : "<div style='opacity:.6'>Sem foto</div>"}
+${state.monitora.assinatura ? `<img src="${state.monitora.assinatura}" class="signature">` : ""}
 
         <div style="margin-top:15px">
           <button class="blue" onclick="modoEdicaoPerfil()">Editar dados</button>
