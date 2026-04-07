@@ -293,6 +293,11 @@ function verPerfilAluno(id){
     </div>
   `;
 }
+function gerarRelatorioDireto(id){
+  setAba("relatorios");
+  r_aluno.value = id;
+  renderRelatorio();
+}  
 function editarAlunoDireto(id){
   preencherAlunoForm(alunoById(id));
   setAba("alunos");
