@@ -212,7 +212,82 @@ function salvarPerfil(){
   function coletarPerfil(){state.monitora.nome=$("m_nome").value;state.monitora.cpf=m_cpf.value;state.monitora.cnpj=m_cnpj.value;state.monitora.telefone=m_telefone.value;state.monitora.email=m_email.value;save();renderRelatorio()}
 function resetAlunoForm(){state.editandoAlunoId="";a_nome.value="";a_escola.value="";a_serie.value="";a_turma.value="";a_nascimento.value="";a_turno.value="Manhã";a_horario.value="08:00 às 12:00";a_responsavel.value="";a_numero.value="";a_ativo.value="sim";a_obs.value="";a_foto_input.value="";a_foto_preview.classList.add("hidden");a_foto_preview.src="";cancelarEdicaoBtn.classList.add("hidden");salvarAlunoBtn.textContent="Salvar aluno"}
 function preencherAlunoForm(a){state.editandoAlunoId=a.id;a_nome.value=a.nome||"";a_escola.value=a.escola||"";a_serie.value=a.serie||"";a_turma.value=a.turma||"";a_nascimento.value=a.dataNascimento||"";a_turno.value=a.turnoPadrao||"Manhã";a_horario.value=a.horarioPadrao||"";a_responsavel.value=a.nomeResponsavel||"";a_numero.value=a.numeroResponsavel||"";a_ativo.value=a.ativo?"sim":"nao";a_obs.value=a.observacoesGerais||"";a.foto?(a_foto_preview.src=a.foto,a_foto_preview.classList.remove("hidden")):a_foto_preview.classList.add("hidden");cancelarEdicaoBtn.classList.remove("hidden");salvarAlunoBtn.textContent="Atualizar aluno"}
-function renderAlunos(){listaAlunos.innerHTML="";if(!state.alunos.length)listaAlunos.innerHTML='<div style="opacity:.7">Nenhum aluno cadastrado.</div>';state.alunos.forEach(a=>{const div=document.createElement("div");div.className="rowitem";div.innerHTML=`<div><strong>${a.nome}</strong><div style="opacity:.75;font-size:14px">${a.escola} • ${a.serie} • Turma ${a.turma}</div><div style="opacity:.75;font-size:14px">Turno: ${a.turnoPadrao} • Horário: ${a.horarioPadrao}</div><div style="opacity:.75;font-size:14px">Responsável: ${a.nomeResponsavel||"-"} • ${a.numeroResponsavel||"-"}</div><div style="opacity:.75;font-size:14px">Status: ${a.ativo?"Ativo":"Inativo"}</div></div><div style="display:flex;gap:8px"><button class="gray" data-edit="${a.id}">Editar</button><button class="blue" data-del="${a.id}">Excluir</button></div>`;listaAlunos.appendChild(div)});listaAlunos.querySelectorAll("[data-edit]").forEach(btn=>btn.onclick=()=>{preencherAlunoForm(alunoById(btn.dataset.edit));setAba("alunos")});listaAlunos.querySelectorAll("[data-del]").forEach(btn=>btn.onclick=()=>{const id=btn.dataset.del;state.alunos=state.alunos.filter(a=>a.id!==id);state.registros=state.registros.filter(r=>r.alunoId!==id);save();renderAll()});renderSelects()}
+function renderAlunos() {
+  listaAlunos.innerHTML = "";
+
+  if (!state.alunos.length) {
+    listaAlunos.innerHTML = '<div style="opacity:.7">Nenhum aluno cadastrado.</div>';
+    return;
+  }
+
+  state.alunos.forEach(a => {
+    const div = document.createElement("div");
+
+    div.className = "card"; // reaproveita seu estilo
+
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:10px">
+        
+        <div>
+          <div style="font-size:18px;font-weight:700">${a.nome}</div>
+          <div style="opacity:.7;font-size:14px">${a.escola || "Sem escola"}</div>
+        </div>
+
+        <button data-del="${a.id}" style="background:none;border:none;font-size:18px;cursor:pointer">
+          🗑️
+        </button>
+      </div>
+
+      <div style="margin-top:10px;font-size:14px;opacity:.8">
+        ${a.serie || "-"} • Turma ${a.turma || "-"}
+      </div>
+
+      <div style="margin-top:6px;font-size:14px;opacity:.8">
+        Turno: ${a.turnoPadrao} • ${a.horarioPadrao || "-"}
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="gray" data-edit="${a.id}">Editar</button>
+        <button class="blue" data-view="${a.id}">Ver perfil</button>
+      </div>
+    `;
+
+    listaAlunos.appendChild(div);
+  });
+
+  // editar
+  listaAlunos.querySelectorAll("[data-edit]").forEach(btn =>
+    btn.onclick = () => {
+      preencherAlunoForm(alunoById(btn.dataset.edit));
+      setAba("alunos");
+    }
+  );
+
+  // excluir (com confirmação melhor)
+  listaAlunos.querySelectorAll("[data-del]").forEach(btn =>
+    btn.onclick = () => {
+      if (!confirm("Excluir aluno?")) return;
+
+      const id = btn.dataset.del;
+
+      state.alunos = state.alunos.filter(a => a.id !== id);
+      state.registros = state.registros.filter(r => r.alunoId !== id);
+
+      save();
+      renderAll();
+    }
+  );
+
+  // visualizar (nova base pra evolução futura)
+  listaAlunos.querySelectorAll("[data-view]").forEach(btn =>
+    btn.onclick = () => {
+      const a = alunoById(btn.dataset.view);
+      alert(`Aluno: ${a.nome}\nEscola: ${a.escola}`);
+    }
+  );
+
+  renderSelects();
+}
 function renderSelects(){const ativos=state.alunos.filter(a=>a.ativo);function fill(select,list){const cur=select.value;select.innerHTML='<option value="">Selecione o aluno</option>';list.forEach(a=>{const o=document.createElement("option");o.value=a.id;o.textContent=a.nome;select.appendChild(o)});select.value=cur} fill(l_aluno,ativos);fill(r_aluno,state.alunos)}
 function renderInfoLancamento(){const a=alunoById(l_aluno.value);l_info.textContent=a?`Aluno: ${a.nome} • Escola: ${a.escola} • Horário padrão: ${a.horarioPadrao||"-"}`:""}
 function updateHorarioUI(){const padrao=l_modo_horario.value==="padrao";horario_padrao_wrap.classList.toggle("hidden",!padrao);horario_manual_wrap.classList.toggle("hidden",padrao)}
