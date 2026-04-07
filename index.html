@@ -185,12 +185,28 @@ function modoEdicaoPerfil(){
   document.getElementById("aba-perfil").innerHTML = `
     <div class="card">
       <h3>Perfil da Monitora</h3>
+
       <div class="grid">
         <div><div class="label">Nome</div><input id="m_nome" value="${state.monitora.nome||""}"></div>
         <div><div class="label">CPF</div><input id="m_cpf" value="${state.monitora.cpf||""}"></div>
         <div><div class="label">CNPJ</div><input id="m_cnpj" value="${state.monitora.cnpj||""}"></div>
         <div><div class="label">Telefone</div><input id="m_telefone" value="${state.monitora.telefone||""}"></div>
         <div><div class="label">Email</div><input id="m_email" value="${state.monitora.email||""}"></div>
+
+        <div>
+          <div class="label">Foto da monitora</div>
+          <input id="m_foto_input" type="file" accept="image/*">
+        </div>
+
+        <div>
+          <div class="label">Assinatura</div>
+          <input id="m_assinatura_input" type="file" accept="image/*">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:16px">
+        ${state.monitora.foto ? `<img src="${state.monitora.foto}" class="preview">` : ""}
+        ${state.monitora.assinatura ? `<img src="${state.monitora.assinatura}" class="signature">` : ""}
       </div>
 
       <div style="margin-top:15px">
@@ -199,7 +215,7 @@ function modoEdicaoPerfil(){
     </div>
   `;
 
-  ativarEventosPerfil();
+    ativarEventosPerfil();
 }
 function salvarPerfil(){
   state.monitora.nome = $("m_nome").value;
@@ -407,15 +423,40 @@ $("senha").addEventListener("keydown", (e) => {
   document.querySelectorAll(".navbtn").forEach(btn=>btn.onclick=()=>setAba(btn.dataset.aba));
 document.querySelectorAll("[data-home]").forEach(btn=>btn.onclick=()=>setAba(btn.dataset.home));
 function ativarEventosPerfil(){
+  // inputs de texto
   ["m_nome","m_cpf","m_cnpj","m_telefone","m_email"].forEach(id=>{
     const el = document.getElementById(id);
     if(el){
       el.addEventListener("input", coletarPerfil);
     }
   });
+
+  // 📸 FOTO
+  const fotoInput = document.getElementById("m_foto_input");
+  if(fotoInput){
+    fotoInput.addEventListener("change", async e=>{
+      const f = e.target.files?.[0];
+      if(!f) return;
+
+      state.monitora.foto = await toBase64(f);
+      save();
+      modoEdicaoPerfil(); // mantém no modo edição
+    });
+  }
+
+  // ✍️ ASSINATURA
+  const assinaturaInput = document.getElementById("m_assinatura_input");
+  if(assinaturaInput){
+    assinaturaInput.addEventListener("change", async e=>{
+      const f = e.target.files?.[0];
+      if(!f) return;
+
+      state.monitora.assinatura = await toBase64(f);
+      save();
+      modoEdicaoPerfil();
+    });
+  }
 }
-m_foto_input.addEventListener("change",async e=>{const f=e.target.files?.[0];if(!f)return;state.monitora.foto=await toBase64(f);save();preencherPerfil()});
-m_assinatura_input.addEventListener("change",async e=>{const f=e.target.files?.[0];if(!f)return;state.monitora.assinatura=await toBase64(f);save();preencherPerfil();renderRelatorio()});
 a_foto_input.addEventListener("change",async e=>{const f=e.target.files?.[0];if(!f)return;const img=await toBase64(f);a_foto_preview.src=img;a_foto_preview.classList.remove("hidden")});
 salvarAlunoBtn.onclick=()=>{if(!a_nome.value.trim())return alert("Informe o nome do aluno.");const foto=a_foto_preview.classList.contains("hidden")?"":a_foto_preview.src;const aluno={id:state.editandoAlunoId||uid(),nome:a_nome.value,escola:a_escola.value,serie:a_serie.value,turma:a_turma.value,dataNascimento:a_nascimento.value,turnoPadrao:a_turno.value,horarioPadrao:a_horario.value,nomeResponsavel:a_responsavel.value,numeroResponsavel:a_numero.value,ativo:a_ativo.value==="sim",foto,observacoesGerais:a_obs.value};if(state.editandoAlunoId)state.alunos=state.alunos.map(a=>a.id===state.editandoAlunoId?aluno:a);else state.alunos.push(aluno);state.editandoAlunoId="";save();resetAlunoForm();renderAll()};
 cancelarEdicaoBtn.onclick=resetAlunoForm; fillTimeSelects(); l_data.value=new Date().toISOString().slice(0,10);
