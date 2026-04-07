@@ -178,7 +178,25 @@ function preencherPerfil(){
     modoEdicaoPerfil();
   }
 }
-function coletarPerfil(){state.monitora.nome=$("m_nome").value;state.monitora.cpf=m_cpf.value;state.monitora.cnpj=m_cnpj.value;state.monitora.telefone=m_telefone.value;state.monitora.email=m_email.value;save();renderRelatorio()}
+function modoEdicaoPerfil(){
+  document.getElementById("aba-perfil").innerHTML = `
+    <div class="card">
+      <h3>Perfil da Monitora</h3>
+      <div class="grid">
+        <div><div class="label">Nome</div><input id="m_nome" value="${state.monitora.nome||""}"></div>
+        <div><div class="label">CPF</div><input id="m_cpf" value="${state.monitora.cpf||""}"></div>
+        <div><div class="label">CNPJ</div><input id="m_cnpj" value="${state.monitora.cnpj||""}"></div>
+        <div><div class="label">Telefone</div><input id="m_telefone" value="${state.monitora.telefone||""}"></div>
+        <div><div class="label">Email</div><input id="m_email" value="${state.monitora.email||""}"></div>
+      </div>
+
+      <div style="margin-top:15px">
+        <button class="green" onclick="salvarPerfil()">Salvar</button>
+      </div>
+    </div>
+  `;
+}
+  function coletarPerfil(){state.monitora.nome=$("m_nome").value;state.monitora.cpf=m_cpf.value;state.monitora.cnpj=m_cnpj.value;state.monitora.telefone=m_telefone.value;state.monitora.email=m_email.value;save();renderRelatorio()}
 function resetAlunoForm(){state.editandoAlunoId="";a_nome.value="";a_escola.value="";a_serie.value="";a_turma.value="";a_nascimento.value="";a_turno.value="Manhã";a_horario.value="08:00 às 12:00";a_responsavel.value="";a_numero.value="";a_ativo.value="sim";a_obs.value="";a_foto_input.value="";a_foto_preview.classList.add("hidden");a_foto_preview.src="";cancelarEdicaoBtn.classList.add("hidden");salvarAlunoBtn.textContent="Salvar aluno"}
 function preencherAlunoForm(a){state.editandoAlunoId=a.id;a_nome.value=a.nome||"";a_escola.value=a.escola||"";a_serie.value=a.serie||"";a_turma.value=a.turma||"";a_nascimento.value=a.dataNascimento||"";a_turno.value=a.turnoPadrao||"Manhã";a_horario.value=a.horarioPadrao||"";a_responsavel.value=a.nomeResponsavel||"";a_numero.value=a.numeroResponsavel||"";a_ativo.value=a.ativo?"sim":"nao";a_obs.value=a.observacoesGerais||"";a.foto?(a_foto_preview.src=a.foto,a_foto_preview.classList.remove("hidden")):a_foto_preview.classList.add("hidden");cancelarEdicaoBtn.classList.remove("hidden");salvarAlunoBtn.textContent="Atualizar aluno"}
 function renderAlunos(){listaAlunos.innerHTML="";if(!state.alunos.length)listaAlunos.innerHTML='<div style="opacity:.7">Nenhum aluno cadastrado.</div>';state.alunos.forEach(a=>{const div=document.createElement("div");div.className="rowitem";div.innerHTML=`<div><strong>${a.nome}</strong><div style="opacity:.75;font-size:14px">${a.escola} • ${a.serie} • Turma ${a.turma}</div><div style="opacity:.75;font-size:14px">Turno: ${a.turnoPadrao} • Horário: ${a.horarioPadrao}</div><div style="opacity:.75;font-size:14px">Responsável: ${a.nomeResponsavel||"-"} • ${a.numeroResponsavel||"-"}</div><div style="opacity:.75;font-size:14px">Status: ${a.ativo?"Ativo":"Inativo"}</div></div><div style="display:flex;gap:8px"><button class="gray" data-edit="${a.id}">Editar</button><button class="blue" data-del="${a.id}">Excluir</button></div>`;listaAlunos.appendChild(div)});listaAlunos.querySelectorAll("[data-edit]").forEach(btn=>btn.onclick=()=>{preencherAlunoForm(alunoById(btn.dataset.edit));setAba("alunos")});listaAlunos.querySelectorAll("[data-del]").forEach(btn=>btn.onclick=()=>{const id=btn.dataset.del;state.alunos=state.alunos.filter(a=>a.id!==id);state.registros=state.registros.filter(r=>r.alunoId!==id);save();renderAll()});renderSelects()}
