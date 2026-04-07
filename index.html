@@ -211,7 +211,72 @@ function salvarPerfil(){
   save();
   preencherPerfil();
 }
-  function coletarPerfil(){state.monitora.nome=$("m_nome").value;state.monitora.cpf=m_cpf.value;state.monitora.cnpj=m_cnpj.value;state.monitora.telefone=m_telefone.value;state.monitora.email=m_email.value;save();renderRelatorio()}
+function coletarPerfil(){
+  state.monitora.nome = $("m_nome")?.value || "";
+  state.monitora.cpf = $("m_cpf")?.value || "";
+  state.monitora.cnpj = $("m_cnpj")?.value || "";
+  state.monitora.telefone = $("m_telefone")?.value || "";
+  state.monitora.email = $("m_email")?.value || "";
+
+  save();
+  renderRelatorio();
+}
+function verPerfilAluno(id){
+  const a = alunoById(id);
+  if(!a) return;
+
+  const container = document.getElementById("aba-alunos");
+
+  container.innerHTML = `
+    <div class="card">
+
+      <button class="gray" onclick="renderAll(); setAba('alunos')" style="margin-bottom:10px">
+        ← Voltar
+      </button>
+
+      <h3 style="margin-top:0">Perfil do Aluno</h3>
+
+      ${a.foto ? `<img src="${a.foto}" class="preview">` : ""}
+
+      <div style="margin-top:10px">
+        <p><strong>Nome:</strong> ${a.nome}</p>
+        <p><strong>Escola:</strong> ${a.escola || "-"}</p>
+        <p><strong>Série:</strong> ${a.serie || "-"}</p>
+        <p><strong>Turma:</strong> ${a.turma || "-"}</p>
+        <p><strong>Turno:</strong> ${a.turnoPadrao}</p>
+        <p><strong>Horário:</strong> ${a.horarioPadrao || "-"}</p>
+        <p><strong>Responsável:</strong> ${a.nomeResponsavel || "-"}</p>
+        <p><strong>Telefone:</strong> ${a.numeroResponsavel || "-"}</p>
+        <p><strong>Status:</strong> ${a.ativo ? "Ativo" : "Inativo"}</p>
+        <p><strong>Observações:</strong> ${a.observacoesGerais || "-"}</p>
+      </div>
+
+      <div style="margin-top:15px;display:flex;gap:10px">
+        <button class="green" onclick="editarAlunoDireto('${a.id}')">
+          Editar
+        </button>
+
+        <button class="blue" onclick="irParaLancamento('${a.id}')">
+          Lançar atendimento
+        </button>
+      </div>
+
+    </div>
+  `;
+}
+function editarAlunoDireto(id){
+  preencherAlunoForm(alunoById(id));
+  setAba("alunos");
+}
+function irParaLancamento(id){
+  setAba("lancamento");
+  l_aluno.value = id;
+  renderInfoLancamento();
+}
+// ver perfil
+listaAlunos.querySelectorAll("[data-view]").forEach(btn =>
+  btn.onclick = () => verPerfilAluno(btn.dataset.view)
+);
 function resetAlunoForm(){state.editandoAlunoId="";a_nome.value="";a_escola.value="";a_serie.value="";a_turma.value="";a_nascimento.value="";a_turno.value="Manhã";a_horario.value="08:00 às 12:00";a_responsavel.value="";a_numero.value="";a_ativo.value="sim";a_obs.value="";a_foto_input.value="";a_foto_preview.classList.add("hidden");a_foto_preview.src="";cancelarEdicaoBtn.classList.add("hidden");salvarAlunoBtn.textContent="Salvar aluno"}
 function preencherAlunoForm(a){state.editandoAlunoId=a.id;a_nome.value=a.nome||"";a_escola.value=a.escola||"";a_serie.value=a.serie||"";a_turma.value=a.turma||"";a_nascimento.value=a.dataNascimento||"";a_turno.value=a.turnoPadrao||"Manhã";a_horario.value=a.horarioPadrao||"";a_responsavel.value=a.nomeResponsavel||"";a_numero.value=a.numeroResponsavel||"";a_ativo.value=a.ativo?"sim":"nao";a_obs.value=a.observacoesGerais||"";a.foto?(a_foto_preview.src=a.foto,a_foto_preview.classList.remove("hidden")):a_foto_preview.classList.add("hidden");cancelarEdicaoBtn.classList.remove("hidden");salvarAlunoBtn.textContent="Atualizar aluno"}
 function renderAlunos() {
