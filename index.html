@@ -305,7 +305,14 @@ $("senha").addEventListener("keydown", (e) => {
 });
   document.querySelectorAll(".navbtn").forEach(btn=>btn.onclick=()=>setAba(btn.dataset.aba));
 document.querySelectorAll("[data-home]").forEach(btn=>btn.onclick=()=>setAba(btn.dataset.home));
-[m_nome,m_cpf,m_cnpj,m_telefone,m_email].forEach(el=>el.addEventListener("input",coletarPerfil));
+function ativarEventosPerfil(){
+  ["m_nome","m_cpf","m_cnpj","m_telefone","m_email"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el){
+      el.addEventListener("input", coletarPerfil);
+    }
+  });
+}
 m_foto_input.addEventListener("change",async e=>{const f=e.target.files?.[0];if(!f)return;state.monitora.foto=await toBase64(f);save();preencherPerfil()});
 m_assinatura_input.addEventListener("change",async e=>{const f=e.target.files?.[0];if(!f)return;state.monitora.assinatura=await toBase64(f);save();preencherPerfil();renderRelatorio()});
 a_foto_input.addEventListener("change",async e=>{const f=e.target.files?.[0];if(!f)return;const img=await toBase64(f);a_foto_preview.src=img;a_foto_preview.classList.remove("hidden")});
