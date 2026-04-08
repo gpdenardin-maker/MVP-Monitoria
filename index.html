@@ -42,6 +42,7 @@ img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border
 <button data-aba="inicio" class="navbtn gray">Home</button>
 <button data-aba="perfil" class="navbtn gray">Perfil da Monitora</button>
 <button data-aba="alunos" class="navbtn gray">Cadastro de Alunos</button>
+<button data-aba="meus-alunos" class="navbtn gray">Meus Alunos</button>
 <button data-aba="lancamento" class="navbtn gray">Lançamento Rápido</button>
 <button data-aba="relatorios" class="navbtn gray">Relatórios</button>
 </div></div>
@@ -93,6 +94,14 @@ img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border
 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button id="salvarAlunoBtn" class="green">Salvar aluno</button><button id="cancelarEdicaoBtn" class="gray hidden">Cancelar edição</button></div>
 </div>
 <div class="card"><h3 style="margin-top:0">Alunos cadastrados</h3><div id="listaAlunos"></div></div>
+</div>
+<div id="aba-meus-alunos" class="aba hidden">
+  <div class="card">
+    <h3 style="margin-top:0">Meus Alunos</h3>
+
+    <div id="gridMeusAlunos" class="grid"></div>
+
+  </div>
 </div>
 
 <div id="aba-lancamento" class="aba hidden">
