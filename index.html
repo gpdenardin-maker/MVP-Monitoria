@@ -163,8 +163,29 @@ function alunoById(id){return state.alunos.find(a=>a.id===id)}
 function parseHorario(h){const m=h.match(/(\d{2}):(\d{2}) às (\d{2}):(\d{2})/);return m?{hi:m[1],mi:m[2],hf:m[3],mf:m[4]}:null}
 function horarioManualTexto(){return `${l_hi.value}:${l_mi.value} às ${l_hf.value}:${l_mf.value}`}
 function fillTimeSelects(){const hs=Array.from({length:24},(_,i)=>String(i).padStart(2,"0")), ms=["00","05","10","15","20","25","30","35","40","45","50","55"]; [l_hi,l_hf].forEach(s=>{s.innerHTML="";hs.forEach(h=>{const o=document.createElement("option");o.value=h;o.textContent=h+"h";s.appendChild(o)})}); [l_mi,l_mf].forEach(s=>{s.innerHTML="";ms.forEach(m=>{const o=document.createElement("option");o.value=m;o.textContent=m+"m";s.appendChild(o)})}); l_hi.value="08";l_mi.value="00";l_hf.value="12";l_mf.value="00"}
-function setAba(nome){document.querySelectorAll(".aba").forEach(el=>el.classList.add("hidden"));document.querySelectorAll(".navbtn").forEach(el=>{el.classList.remove("green");el.classList.add("gray")});document.getElementById("aba-"+nome).classList.remove("hidden");const btn=document.querySelector(`[data-aba="${nome}"]`);if(btn){btn.classList.remove("gray");btn.classList.add("green")} if(nome==="relatorios")renderRelatorio()}
-function renderHome(){home_alunos.textContent=String(state.alunos.length);home_registros.textContent=String(state.registros.length)}
+function setAba(nome){
+  // esconde todas as abas
+  document.querySelectorAll(".aba").forEach(el => el.classList.add("hidden"));
+
+  // mostra a aba atual
+  document.getElementById("aba-" + nome).classList.remove("hidden");
+
+  // atualiza cor dos botões
+  document.querySelectorAll(".navbtn").forEach(el => {
+    el.classList.remove("green");
+    el.classList.add("gray");
+  });
+
+  const btn = document.querySelector(`[data-aba="${nome}"]`);
+  if(btn){
+    btn.classList.remove("gray");
+    btn.classList.add("green");
+  }
+
+  // 🔥 renderizações específicas
+  if(nome === "perfil") preencherPerfil();
+  if(nome === "relatorios") renderRelatorio();
+}function renderHome(){home_alunos.textContent=String(state.alunos.length);home_registros.textContent=String(state.registros.length)}
 function preencherPerfil(){
   const temDados = state.monitora.nome || state.monitora.email || state.monitora.telefone;
 
