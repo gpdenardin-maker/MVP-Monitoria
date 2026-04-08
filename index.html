@@ -419,7 +419,7 @@ function editarRegistro(id){const r=state.registros.find(x=>x.id===id);if(!r)ret
 function excluirRegistro(id){state.registros=state.registros.filter(r=>r.id!==id);if(state.editandoRegistroId===id){state.editandoRegistroId="";l_obs.value="";salvarLancamentoBtn.textContent="Salvar atendimento"}save();renderAll()}
 function registrosFiltrados(){let lista=state.registros.filter(r=>r.alunoId===r_aluno.value);if(r_tipo.value==="mensal")lista=lista.filter(r=>r.data.startsWith(r_mes.value));if(r_tipo.value==="anual")lista=lista.filter(r=>r.data.startsWith(r_ano.value+"-"));return [...lista].sort((a,b)=>a.data.localeCompare(b.data))}
 function renderRelatorio(){const a=alunoById(r_aluno.value), regs=registrosFiltrados(), totalRegistros=regs.length, totalDiasAtendimento=new Set(regs.map(r=>r.data)).size, totalManha=regs.filter(r=>r.turno==="Manhã").length, totalTarde=regs.filter(r=>r.turno==="Tarde").length;rel_titulo.textContent=r_tipo.value==="mensal"?`Relatório mensal • ${r_mes.value}`:r_tipo.value==="anual"?`Relatório anual • ${r_ano.value}`:"Relatório geral do aluno";rel_monitora.innerHTML=`<div>Nome: ${state.monitora.nome||"-"}</div><div>Telefone: ${state.monitora.telefone||"-"}</div><div>Email: ${state.monitora.email||"-"}</div>${r_incluir_cpf.value==="sim"?`<div>CPF: ${state.monitora.cpf||"-"}</div>`:""}${r_incluir_cnpj.value==="sim"?`<div>CNPJ: ${state.monitora.cnpj||"-"}</div>`:""}`;rel_aluno.innerHTML=`<div>Nome: ${a?.nome||"-"}</div><div>Escola: ${a?.escola||"-"}</div><div>Série: ${a?.serie||"-"}</div><div>Turma: ${a?.turma||"-"}</div><div>Responsável: ${a?.nomeResponsavel||"-"}</div><div>Telefone do responsável: ${a?.numeroResponsavel||"-"}</div><div>Idade: ${a?idadePorData(a.dataNascimento):"-"}</div>`;rel_totais.innerHTML=`<div>Total de registros: ${totalRegistros}</div><div>Total de dias de atendimento: ${totalDiasAtendimento}</div><div>Total no turno da manhã: ${totalManha}</div><div>Total no turno da tarde: ${totalTarde}</div>`;rel_tabela.innerHTML="";if(!regs.length)rel_tabela.innerHTML='<tr><td colspan="4">Nenhum registro encontrado.</td></tr>';else regs.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${formatarData(r.data)}</td><td>${r.turno}</td><td>${r.horario}</td><td>${r.observacao||"-"}</td>`;rel_tabela.appendChild(tr)});rel_assinatura.innerHTML=state.monitora.assinatura?`<img src="${state.monitora.assinatura}" class="signature">`:'<div style="height:100px;border-bottom:1px solid #999"></div>'}
-function renderAll(){renderHome();renderAlunos();renderSelects();renderInfoLancamento();renderUltimosRegistros();renderRelatorio()}
+function renderAll(){renderHome();renderSelects();renderInfoLancamento();renderUltimosRegistros();renderRelatorio()}
 document.getElementById("entrarBtn").onclick = () => {if($("senha").value===PASSWORD){login.classList.add("hidden");app.classList.remove("hidden");setAba("inicio")}else alert("Senha incorreta")};
 $("senha").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
@@ -492,13 +492,14 @@ imprimirBtn.onclick=()=>window.print();pdfBtn.onclick = async () => {
   const imgWidth = pageWidth;
   const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-  let heightLeft = imgHeight;
   let position = 0;
+  let heightLeft = imgHeight;
 
+  // primeira página
   pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-
   heightLeft -= pageHeight;
 
+  // páginas seguintes
   while (heightLeft > 0) {
     position -= pageHeight;
     pdf.addPage();
@@ -506,9 +507,8 @@ imprimirBtn.onclick=()=>window.print();pdfBtn.onclick = async () => {
     heightLeft -= pageHeight;
   }
 
-  pdf.save("relatorio-completo.pdf");
-};
- 
+  pdf.save("relatorio-escolar.pdf");
+}; 
 
 // Inicialização do Sistema
 load();
