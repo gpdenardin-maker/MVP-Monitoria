@@ -584,8 +584,22 @@ imprimirBtn.onclick=()=>window.print();pdfBtn.onclick = async () => {
   }
 
   pdf.save("relatorio-completo.pdf");
-};exportarBtn.onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="controle-acompanhamento-escolar.json";a.click();URL.revokeObjectURL(url)};
-load();updateHorarioUI();renderAll();
+};exportarBtn.onclick=()=>{
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="controle-acompanhamento-escolar.json";
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// Inicialização do Sistema
+load();
+const hj = new Date().toISOString().slice(0, 7); 
+if($("r_mes")) $("r_mes").value = hj;
+if($("r_ano")) $("r_ano").value = new Date().getFullYear();
+renderAll();
 </script>
-  
-</body></html>
+</body>
+</html>
