@@ -3,7 +3,6 @@
 <html lang="pt-BR">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -60,7 +59,9 @@ img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border
 <div style="background:#1f2937;padding:14px;border-radius:10px"><div style="opacity:.75;font-size:14px">Registros salvos</div><div id="home_registros" style="font-size:28px;font-weight:700">0</div></div>
 </div></div></div>
 
-<div id="aba-perfil" class="aba hidden"><div class="card">
+<div id="aba-perfil" class="aba hidden">
+  <div id="perfilConteudo"></div>
+</div>
 <h3 style="margin-top:0">Perfil da Monitora</h3>
 <div class="grid">
 <div><div class="label">Nome da monitora</div><input id="m_nome"></div>
@@ -169,7 +170,7 @@ function preencherPerfil(){
 
   if(temDados){
     // modo visualização
-    document.getElementById("aba-perfil").innerHTML = `
+    document.getElementById("perfilConteudo").innerHTML = `
       <div class="card">
         <h3>Perfil da Monitora</h3>
         <p><strong>Nome:</strong> ${state.monitora.nome || "-"}</p>
