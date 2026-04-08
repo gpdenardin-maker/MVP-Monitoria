@@ -172,6 +172,7 @@ function setAba(nome){
   // 🔥 renderizações específicas
   if(nome === "perfil") preencherPerfil();
   if(nome === "relatorios") renderRelatorio();
+  if(nome === "meus-alunos") renderMeusAlunos();
 }function renderHome(){home_alunos.textContent=String(state.alunos.length);home_registros.textContent=String(state.registros.length)}
 function preencherPerfil(){
   const temDados = state.monitora.nome || state.monitora.email || state.monitora.telefone;
@@ -422,6 +423,40 @@ function renderAlunos() {
   );
 
   renderSelects();
+}
+  function renderMeusAlunos() {
+  const grid = document.getElementById("gridMeusAlunos");
+  grid.innerHTML = "";
+
+  if (!state.alunos.length) {
+    grid.innerHTML = "<div style='opacity:.7'>Nenhum aluno cadastrado.</div>";
+    return;
+  }
+
+  state.alunos.forEach(a => {
+    const div = document.createElement("div");
+
+    div.className = "card";
+
+    div.innerHTML = `
+      ${a.foto ? `<img src="${a.foto}" class="preview">` : ""}
+
+      <div style="font-size:18px;font-weight:700;margin-top:8px">
+        ${a.nome}
+      </div>
+
+      <div style="opacity:.7;font-size:14px">
+        ${a.escola || "Sem escola"}
+      </div>
+
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="blue" onclick="verPerfilAluno('${a.id}')">Ver perfil</button>
+        <button class="gray" onclick="editarAlunoDireto('${a.id}')">Editar</button>
+      </div>
+    `;
+
+    grid.appendChild(div);
+  });
 }
 function renderSelects(){const ativos=state.alunos.filter(a=>a.ativo);function fill(select,list){const cur=select.value;select.innerHTML='<option value="">Selecione o aluno</option>';list.forEach(a=>{const o=document.createElement("option");o.value=a.id;o.textContent=a.nome;select.appendChild(o)});select.value=cur} fill(l_aluno,ativos);fill(r_aluno,state.alunos)}
 function renderInfoLancamento(){const a=alunoById(l_aluno.value);l_info.textContent=a?`Aluno: ${a.nome} • Escola: ${a.escola} • Horário padrão: ${a.horarioPadrao||"-"}`:""}
