@@ -436,7 +436,7 @@ function renderAlunos() {
   state.alunos.forEach(a => {
     const div = document.createElement("div");
 
-    div.className = "card";
+    div.className = "card aluno-card";
 
     div.innerHTML = `
       ${a.foto ? `<img src="${a.foto}" class="preview">` : ""}
