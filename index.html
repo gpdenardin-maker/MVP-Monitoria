@@ -22,12 +22,31 @@ textarea{min-height:90px}button{padding:12px 16px;border:none;border-radius:8px;
 .rowitem{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
 table{width:100%;border-collapse:collapse;background:#fff;color:#000}th,td{border:1px solid #cbd5e1;padding:8px;text-align:left;vertical-align:top}th{background:#e2e8f0}
 img.preview{width:90px;height:90px;object-fit:cover;border-radius:12px;margin-top:14px}
-img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border-radius:12px;padding:8px;margin-top:14px}
-@media print{body{background:#fff}.print-hide{display:none!important}}
-  .aluno-card {
+img.signature{
+  width:220px;
+  height:100px;
+  object-fit:contain;
+  background:#fff;
+  border-radius:12px;
+  padding:8px;
+  margin-top:14px
+}
+
+@media print{
+  body{background:#fff}
+  .print-hide{display:none!important}
+}
+
+/* CARD DO ALUNO */
+.aluno-card {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  transition: 0.2s;
+}
+
+.aluno-card:hover {
+  transform: translateY(-3px);
 }
 
 .aluno-card img:not(.preview) {
