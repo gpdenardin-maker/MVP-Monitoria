@@ -24,6 +24,24 @@ table{width:100%;border-collapse:collapse;background:#fff;color:#000}th,td{borde
 img.preview{width:90px;height:90px;object-fit:cover;border-radius:12px;margin-top:14px}
 img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border-radius:12px;padding:8px;margin-top:14px}
 @media print{body{background:#fff}.print-hide{display:none!important}}
+  .aluno-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.aluno-card img:not(.preview) {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.aluno-card .acoes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 </style>
 </head>
 <body>
