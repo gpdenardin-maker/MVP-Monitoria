@@ -121,6 +121,9 @@ img.signature{
 </div>
 </div>
 <div id="aba-meus-alunos" class="aba hidden">
+  <div id="aba-perfil-aluno" class="aba hidden">
+  <div id="perfilAlunoConteudo"></div>
+</div>
   <div class="card">
     <h3 style="margin-top:0">Meus Alunos</h3>
 
@@ -306,35 +309,32 @@ function verPerfilAluno(id){
     .sort((a,b)=>b.data.localeCompare(a.data))
     .slice(0,5);
 
-  const container = document.getElementById("aba-alunos");
+  const container = document.getElementById("perfilAlunoConteudo");
 
   container.innerHTML = `
     <div class="card">
 
-      <button class="gray" onclick="renderAll(); setAba('alunos')" style="margin-bottom:10px">
+      <button class="gray" onclick="setAba('meus-alunos')" style="margin-bottom:10px">
         ← Voltar
       </button>
 
-      <h3 style="margin-top:0">Perfil do Aluno</h3>
+      <h3>Perfil do Aluno</h3>
 
       ${a.foto ? `<img src="${a.foto}" class="preview">` : ""}
 
-      <div style="margin-top:10px">
-        <p><strong>Nome:</strong> ${a.nome}</p>
-        <p><strong>Escola:</strong> ${a.escola || "-"}</p>
-        <p><strong>Série:</strong> ${a.serie || "-"}</p>
-        <p><strong>Turma:</strong> ${a.turma || "-"}</p>
-      </div>
+      <p><strong>Nome:</strong> ${a.nome}</p>
+      <p><strong>Escola:</strong> ${a.escola || "-"}</p>
+      <p><strong>Série:</strong> ${a.serie || "-"}</p>
+      <p><strong>Turma:</strong> ${a.turma || "-"}</p>
 
       <div style="margin-top:15px">
-        <h4>📊 Resumo</h4>
+        <h4>Resumo</h4>
         <p>Total de atendimentos: <strong>${total}</strong></p>
         <p>Dias atendidos: <strong>${dias}</strong></p>
       </div>
 
       <div style="margin-top:15px">
-        <h4>📅 Últimos atendimentos</h4>
-
+        <h4>Últimos atendimentos</h4>
         ${
           ultimos.length === 0
           ? "<p style='opacity:.7'>Nenhum registro.</p>"
@@ -347,23 +347,15 @@ function verPerfilAluno(id){
       </div>
 
       <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
-        
-        <button class="green" onclick="editarAlunoDireto('${a.id}')">
-          Editar
-        </button>
-
-        <button class="blue" onclick="irParaLancamento('${a.id}')">
-          Lançar atendimento
-        </button>
-
-        <button class="gray" onclick="gerarRelatorioDireto('${a.id}')">
-          Gerar relatório
-        </button>
-
+        <button class="green" onclick="editarAlunoDireto('${a.id}')">Editar</button>
+        <button class="blue" onclick="irParaLancamento('${a.id}')">Lançar atendimento</button>
+        <button class="gray" onclick="gerarRelatorioDireto('${a.id}')">Relatório</button>
       </div>
 
     </div>
   `;
+
+  setAba("perfil-aluno");
 }
 function gerarRelatorioDireto(id){
   setAba("relatorios");
