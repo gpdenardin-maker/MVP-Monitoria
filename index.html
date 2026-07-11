@@ -152,6 +152,43 @@ img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border
   padding:14px 16px 16px;
 }
 .aluno-card .acoes button{flex:1;min-width:100px}
+
+/* ===== SELETOR DE HORÁRIO (Lançamento) ===== */
+.horario-picker{
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.horario-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1;
+  min-width:120px;
+}
+.horario-field-label{
+  font-size:12px;
+  color:var(--text-dim);
+  font-weight:600;
+}
+.horario-field input[type="time"]{
+  font-size:16px;
+  font-weight:700;
+  padding:10px 12px;
+}
+.horario-separador{
+  padding-bottom:12px;
+  color:var(--text-dim);
+  font-size:13px;
+  font-weight:600;
+}
+.horario-padrao-btn{
+  margin-top:10px;
+  font-size:13px;
+  padding:8px 14px;
+  width:100%;
+}
 </style>
 </head>
 <body>
@@ -200,7 +237,8 @@ img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border
 <div><div class="label">Turma</div><input id="a_turma"></div>
 <div><div class="label">Data de nascimento</div><input id="a_nascimento" type="date"></div>
 <div><div class="label">Turno padrão</div><select id="a_turno"><option>Manhã</option><option>Tarde</option></select></div>
-<div><div class="label">Horário padrão</div><input id="a_horario" placeholder="08:00 às 12:00"></div>
+<div><div class="label">Horário padrão — início</div><input id="a_horario_ini" type="time" value="08:00"></div>
+<div><div class="label">Horário padrão — fim</div><input id="a_horario_fim" type="time" value="12:00"></div>
 <div><div class="label">Nome do responsável</div><input id="a_responsavel"></div>
 <div><div class="label">Número do responsável</div><input id="a_numero"></div>
 <div><div class="label">Ativo?</div><select id="a_ativo"><option value="sim">Sim</option><option value="nao">Não</option></select></div>
@@ -212,9 +250,6 @@ img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border
 </div>
 </div>
 <div id="aba-meus-alunos" class="aba hidden">
-  <div id="aba-perfil-aluno" class="aba hidden">
-  <div id="perfilAlunoConteudo"></div>
-</div>
   <div class="card">
     <h3 style="margin-top:0">Meus Alunos</h3>
 
@@ -223,19 +258,24 @@ img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border
   </div>
 </div>
 
+<div id="aba-perfil-aluno" class="aba hidden">
+  <div id="perfilAlunoConteudo"></div>
+</div>
+
 <div id="aba-lancamento" class="aba hidden">
 <div class="card"><h3 style="margin-top:0">Lançamento Rápido</h3>
 <div class="grid">
 <div><div class="label">Selecionar aluno</div><select id="l_aluno"></select></div>
 <div><div class="label">Data completa</div><input id="l_data" type="date"></div>
 <div><div class="label">Turno</div><select id="l_turno"><option>Manhã</option><option>Tarde</option></select></div>
-<div><div class="label">Horário</div>
-<div style="display:grid;gap:8px">
-<select id="l_modo_horario"><option value="padrao">Usar horário padrão do aluno</option><option value="manual">Informar outro horário</option></select>
-<div id="horario_padrao_wrap"><input id="l_horario_padrao" placeholder="08:00 às 12:00"></div>
-<div id="horario_manual_wrap" class="hidden" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-<select id="l_hi"></select><select id="l_mi"></select><select id="l_hf"></select><select id="l_mf"></select>
-</div></div></div>
+<div><div class="label">Horário do atendimento</div>
+<div class="horario-picker">
+<div class="horario-field"><span class="horario-field-label">Início</span><input id="l_hora_inicio" type="time"></div>
+<span class="horario-separador">até</span>
+<div class="horario-field"><span class="horario-field-label">Fim</span><input id="l_hora_fim" type="time"></div>
+</div>
+<button type="button" id="usarHorarioPadraoBtn" class="gray horario-padrao-btn">Usar horário padrão do aluno</button>
+</div>
 <div><div class="label">Observação do dia</div><textarea id="l_obs"></textarea></div>
 </div>
 <div id="l_info" style="margin-top:10px;opacity:.8"></div>
@@ -279,8 +319,7 @@ function idadePorData(d){if(!d)return "";const h=new Date(),n=new Date(d+"T00:00
 function formatarData(d){if(!d)return "";return new Date(d+"T00:00:00").toLocaleDateString("pt-BR")}
 function alunoById(id){return state.alunos.find(a=>a.id===id)}
 function parseHorario(h){const m=h.match(/(\d{2}):(\d{2}) às (\d{2}):(\d{2})/);return m?{hi:m[1],mi:m[2],hf:m[3],mf:m[4]}:null}
-function horarioManualTexto(){return `${l_hi.value}:${l_mi.value} às ${l_hf.value}:${l_mf.value}`}
-function fillTimeSelects(){const hs=Array.from({length:24},(_,i)=>String(i).padStart(2,"0")), ms=["00","05","10","15","20","25","30","35","40","45","50","55"]; [l_hi,l_hf].forEach(s=>{s.innerHTML="";hs.forEach(h=>{const o=document.createElement("option");o.value=h;o.textContent=h+"h";s.appendChild(o)})}); [l_mi,l_mf].forEach(s=>{s.innerHTML="";ms.forEach(m=>{const o=document.createElement("option");o.value=m;o.textContent=m+"m";s.appendChild(o)})}); l_hi.value="08";l_mi.value="00";l_hf.value="12";l_mf.value="00"}
+function horarioTextoDeInputs(){return `${l_hora_inicio.value} às ${l_hora_fim.value}`}
 function setAba(nome){
   // esconde todas as abas
   document.querySelectorAll(".aba").forEach(el => el.classList.add("hidden"));
@@ -462,8 +501,8 @@ function irParaLancamento(id){
   l_aluno.value = id;
   renderInfoLancamento();
 }
-function resetAlunoForm(){state.editandoAlunoId="";a_nome.value="";a_escola.value="";a_serie.value="";a_turma.value="";a_nascimento.value="";a_turno.value="Manhã";a_horario.value="08:00 às 12:00";a_responsavel.value="";a_numero.value="";a_ativo.value="sim";a_obs.value="";a_foto_input.value="";a_foto_preview.classList.add("hidden");a_foto_preview.src="";cancelarEdicaoBtn.classList.add("hidden");salvarAlunoBtn.textContent="Salvar aluno"}
-function preencherAlunoForm(a){state.editandoAlunoId=a.id;a_nome.value=a.nome||"";a_escola.value=a.escola||"";a_serie.value=a.serie||"";a_turma.value=a.turma||"";a_nascimento.value=a.dataNascimento||"";a_turno.value=a.turnoPadrao||"Manhã";a_horario.value=a.horarioPadrao||"";a_responsavel.value=a.nomeResponsavel||"";a_numero.value=a.numeroResponsavel||"";a_ativo.value=a.ativo?"sim":"nao";a_obs.value=a.observacoesGerais||"";a.foto?(a_foto_preview.src=a.foto,a_foto_preview.classList.remove("hidden")):a_foto_preview.classList.add("hidden");cancelarEdicaoBtn.classList.remove("hidden");salvarAlunoBtn.textContent="Atualizar aluno"}
+function resetAlunoForm(){state.editandoAlunoId="";a_nome.value="";a_escola.value="";a_serie.value="";a_turma.value="";a_nascimento.value="";a_turno.value="Manhã";a_horario_ini.value="08:00";a_horario_fim.value="12:00";a_responsavel.value="";a_numero.value="";a_ativo.value="sim";a_obs.value="";a_foto_input.value="";a_foto_preview.classList.add("hidden");a_foto_preview.src="";cancelarEdicaoBtn.classList.add("hidden");salvarAlunoBtn.textContent="Salvar aluno"}
+function preencherAlunoForm(a){state.editandoAlunoId=a.id;a_nome.value=a.nome||"";a_escola.value=a.escola||"";a_serie.value=a.serie||"";a_turma.value=a.turma||"";a_nascimento.value=a.dataNascimento||"";a_turno.value=a.turnoPadrao||"Manhã";const ph=parseHorario(a.horarioPadrao||"");a_horario_ini.value=ph?`${ph.hi}:${ph.mi}`:"08:00";a_horario_fim.value=ph?`${ph.hf}:${ph.mf}`:"12:00";a_responsavel.value=a.nomeResponsavel||"";a_numero.value=a.numeroResponsavel||"";a_ativo.value=a.ativo?"sim":"nao";a_obs.value=a.observacoesGerais||"";a.foto?(a_foto_preview.src=a.foto,a_foto_preview.classList.remove("hidden")):a_foto_preview.classList.add("hidden");cancelarEdicaoBtn.classList.remove("hidden");salvarAlunoBtn.textContent="Atualizar aluno"}
  function renderMeusAlunos() {
   const grid = document.getElementById("gridMeusAlunos");
   grid.innerHTML = "";
@@ -506,9 +545,8 @@ function preencherAlunoForm(a){state.editandoAlunoId=a.id;a_nome.value=a.nome||"
 }
 function renderSelects(){const ativos=state.alunos.filter(a=>a.ativo);function fill(select,list){const cur=select.value;select.innerHTML='<option value="">Selecione o aluno</option>';list.forEach(a=>{const o=document.createElement("option");o.value=a.id;o.textContent=a.nome;select.appendChild(o)});select.value=cur} fill(l_aluno,ativos);fill(r_aluno,state.alunos)}
 function renderInfoLancamento(){const a=alunoById(l_aluno.value);l_info.textContent=a?`Aluno: ${a.nome} • Escola: ${a.escola} • Horário padrão: ${a.horarioPadrao||"-"}`:""}
-function updateHorarioUI(){const padrao=l_modo_horario.value==="padrao";horario_padrao_wrap.classList.toggle("hidden",!padrao);horario_manual_wrap.classList.toggle("hidden",padrao)}
 function renderUltimosRegistros(){const lista=[...state.registros].sort((a,b)=>b.data.localeCompare(a.data)).slice(0,5);ultimosRegistros.innerHTML="";if(!lista.length){ultimosRegistros.innerHTML='<div style="opacity:.7">Nenhum registro salvo.</div>';return}lista.forEach(r=>{const a=alunoById(r.alunoId);const div=document.createElement("div");div.className="record";div.innerHTML=`<strong>${a?a.nome:"Aluno"}</strong> • ${formatarData(r.data)} • ${r.turno} • ${r.horario}${r.observacao?`<div style="opacity:.75;margin-top:4px">${r.observacao}</div>`:""}<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="gray" data-ereg="${r.id}">Editar registro</button><button class="blue" data-xreg="${r.id}">Excluir registro</button></div>`;ultimosRegistros.appendChild(div)});ultimosRegistros.querySelectorAll("[data-ereg]").forEach(btn=>btn.onclick=()=>editarRegistro(btn.dataset.ereg));ultimosRegistros.querySelectorAll("[data-xreg]").forEach(btn=>btn.onclick=()=>excluirRegistro(btn.dataset.xreg))}
-function editarRegistro(id){const r=state.registros.find(x=>x.id===id);if(!r)return;state.editandoRegistroId=id;l_aluno.value=r.alunoId;l_data.value=r.data;l_turno.value=r.turno;l_obs.value=r.observacao||"";const a=alunoById(r.alunoId);if(a&&r.horario===a.horarioPadrao){l_modo_horario.value="padrao";l_horario_padrao.value=a.horarioPadrao}else{l_modo_horario.value="manual";const p=parseHorario(r.horario);if(p){l_hi.value=p.hi;l_mi.value=p.mi;l_hf.value=p.hf;l_mf.value=p.mf}}salvarLancamentoBtn.textContent="Atualizar atendimento";updateHorarioUI();renderInfoLancamento();setAba("lancamento")}
+function editarRegistro(id){const r=state.registros.find(x=>x.id===id);if(!r)return;state.editandoRegistroId=id;l_aluno.value=r.alunoId;l_data.value=r.data;l_turno.value=r.turno;l_obs.value=r.observacao||"";const p=parseHorario(r.horario);if(p){l_hora_inicio.value=`${p.hi}:${p.mi}`;l_hora_fim.value=`${p.hf}:${p.mf}`}salvarLancamentoBtn.textContent="Atualizar atendimento";renderInfoLancamento();setAba("lancamento")}
 function excluirRegistro(id){state.registros=state.registros.filter(r=>r.id!==id);if(state.editandoRegistroId===id){state.editandoRegistroId="";l_obs.value="";salvarLancamentoBtn.textContent="Salvar atendimento"}save();renderAll()}
 function registrosFiltrados(){let lista=state.registros.filter(r=>r.alunoId===r_aluno.value);if(r_tipo.value==="mensal")lista=lista.filter(r=>r.data.startsWith(r_mes.value));if(r_tipo.value==="anual")lista=lista.filter(r=>r.data.startsWith(r_ano.value+"-"));return [...lista].sort((a,b)=>a.data.localeCompare(b.data))}
 function renderRelatorio(){const a=alunoById(r_aluno.value), regs=registrosFiltrados(), totalRegistros=regs.length, totalDiasAtendimento=new Set(regs.map(r=>r.data)).size, totalManha=regs.filter(r=>r.turno==="Manhã").length, totalTarde=regs.filter(r=>r.turno==="Tarde").length;rel_titulo.textContent=r_tipo.value==="mensal"?`Relatório mensal • ${r_mes.value}`:r_tipo.value==="anual"?`Relatório anual • ${r_ano.value}`:"Relatório geral do aluno";rel_monitora.innerHTML=`<div>Nome: ${state.monitora.nome||"-"}</div><div>Telefone: ${state.monitora.telefone||"-"}</div><div>Email: ${state.monitora.email||"-"}</div>${r_incluir_cpf.value==="sim"?`<div>CPF: ${state.monitora.cpf||"-"}</div>`:""}${r_incluir_cnpj.value==="sim"?`<div>CNPJ: ${state.monitora.cnpj||"-"}</div>`:""}`;rel_aluno.innerHTML=`<div>Nome: ${a?.nome||"-"}</div><div>Escola: ${a?.escola||"-"}</div><div>Série: ${a?.serie||"-"}</div><div>Turma: ${a?.turma||"-"}</div><div>Responsável: ${a?.nomeResponsavel||"-"}</div><div>Telefone do responsável: ${a?.numeroResponsavel||"-"}</div><div>Idade: ${a?idadePorData(a.dataNascimento):"-"}</div>`;rel_totais.innerHTML=`<div>Total de registros: ${totalRegistros}</div><div>Total de dias de atendimento: ${totalDiasAtendimento}</div><div>Total no turno da manhã: ${totalManha}</div><div>Total no turno da tarde: ${totalTarde}</div>`;rel_tabela.innerHTML="";if(!regs.length)rel_tabela.innerHTML='<tr><td colspan="4">Nenhum registro encontrado.</td></tr>';else regs.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${formatarData(r.data)}</td><td>${r.turno}</td><td>${r.horario}</td><td>${r.observacao||"-"}</td>`;rel_tabela.appendChild(tr)});rel_assinatura.innerHTML=state.monitora.assinatura?`<img src="${state.monitora.assinatura}" class="signature">`:'<div style="height:100px;border-bottom:1px solid #999"></div>'}
@@ -571,11 +609,12 @@ function ativarEventosPerfil(){
   }
 }
 a_foto_input.addEventListener("change",async e=>{const f=e.target.files?.[0];if(!f)return;const img=await toBase64(f);a_foto_preview.src=img;a_foto_preview.classList.remove("hidden")});
-salvarAlunoBtn.onclick=()=>{if(!a_nome.value.trim())return alert("Informe o nome do aluno.");const foto=a_foto_preview.classList.contains("hidden")?"":a_foto_preview.src;const aluno={id:state.editandoAlunoId||uid(),nome:a_nome.value,escola:a_escola.value,serie:a_serie.value,turma:a_turma.value,dataNascimento:a_nascimento.value,turnoPadrao:a_turno.value,horarioPadrao:a_horario.value,nomeResponsavel:a_responsavel.value,numeroResponsavel:a_numero.value,ativo:a_ativo.value==="sim",foto,observacoesGerais:a_obs.value};if(state.editandoAlunoId)state.alunos=state.alunos.map(a=>a.id===state.editandoAlunoId?aluno:a);else state.alunos.push(aluno);state.editandoAlunoId="";save();resetAlunoForm();renderAll()};
-cancelarEdicaoBtn.onclick=resetAlunoForm; fillTimeSelects(); l_data.value=new Date().toISOString().slice(0,10);
-l_aluno.onchange=()=>{const a=alunoById(l_aluno.value);if(a){l_turno.value=a.turnoPadrao;l_horario_padrao.value=a.horarioPadrao;const p=parseHorario(a.horarioPadrao);if(p){l_hi.value=p.hi;l_mi.value=p.mi;l_hf.value=p.hf;l_mf.value=p.mf}}renderInfoLancamento()};
-l_modo_horario.onchange=updateHorarioUI;
-salvarLancamentoBtn.onclick=()=>{if(!l_aluno.value)return alert("Selecione o aluno.");if(!l_data.value)return alert("Informe a data completa.");const a=alunoById(l_aluno.value);const horario=l_modo_horario.value==="padrao"?(a?.horarioPadrao||l_horario_padrao.value):horarioManualTexto();const reg={id:state.editandoRegistroId||uid(),alunoId:l_aluno.value,data:l_data.value,turno:l_turno.value,horario,observacao:l_obs.value};if(state.editandoRegistroId)state.registros=state.registros.map(r=>r.id===state.editandoRegistroId?reg:r);else state.registros.push(reg);state.editandoRegistroId="";salvarLancamentoBtn.textContent="Salvar atendimento";l_obs.value="";save();r_aluno.value=l_aluno.value;renderAll()};
+salvarAlunoBtn.onclick=()=>{if(!a_nome.value.trim())return alert("Informe o nome do aluno.");const foto=a_foto_preview.classList.contains("hidden")?"":a_foto_preview.src;const horarioPadrao=(a_horario_ini.value&&a_horario_fim.value)?`${a_horario_ini.value} às ${a_horario_fim.value}`:"";const aluno={id:state.editandoAlunoId||uid(),nome:a_nome.value,escola:a_escola.value,serie:a_serie.value,turma:a_turma.value,dataNascimento:a_nascimento.value,turnoPadrao:a_turno.value,horarioPadrao,nomeResponsavel:a_responsavel.value,numeroResponsavel:a_numero.value,ativo:a_ativo.value==="sim",foto,observacoesGerais:a_obs.value};if(state.editandoAlunoId)state.alunos=state.alunos.map(a=>a.id===state.editandoAlunoId?aluno:a);else state.alunos.push(aluno);state.editandoAlunoId="";save();resetAlunoForm();renderAll()};
+cancelarEdicaoBtn.onclick=resetAlunoForm; l_data.value=new Date().toISOString().slice(0,10);
+function aplicarHorarioPadrao(){const a=alunoById(l_aluno.value);if(!a)return;const p=parseHorario(a.horarioPadrao||"");if(p){l_hora_inicio.value=`${p.hi}:${p.mi}`;l_hora_fim.value=`${p.hf}:${p.mf}`}}
+l_aluno.onchange=()=>{const a=alunoById(l_aluno.value);if(a){l_turno.value=a.turnoPadrao;aplicarHorarioPadrao()}renderInfoLancamento()};
+usarHorarioPadraoBtn.onclick=()=>{if(!l_aluno.value)return alert("Selecione o aluno primeiro.");aplicarHorarioPadrao()};
+salvarLancamentoBtn.onclick=()=>{if(!l_aluno.value)return alert("Selecione o aluno.");if(!l_data.value)return alert("Informe a data completa.");if(!l_hora_inicio.value||!l_hora_fim.value)return alert("Informe o horário de início e fim.");const horario=horarioTextoDeInputs();const reg={id:state.editandoRegistroId||uid(),alunoId:l_aluno.value,data:l_data.value,turno:l_turno.value,horario,observacao:l_obs.value};if(state.editandoRegistroId)state.registros=state.registros.map(r=>r.id===state.editandoRegistroId?reg:r);else state.registros.push(reg);state.editandoRegistroId="";salvarLancamentoBtn.textContent="Salvar atendimento";l_obs.value="";save();r_aluno.value=l_aluno.value;renderAll()};
 r_tipo.onchange=()=>{r_mes_wrap.classList.toggle("hidden",r_tipo.value!=="mensal");r_ano_wrap.classList.toggle("hidden",r_tipo.value!=="anual");renderRelatorio()};
 [r_aluno,r_mes,r_ano,r_incluir_cpf,r_incluir_cnpj].forEach(el=>el.onchange=renderRelatorio);
 imprimirBtn.onclick=()=>window.print();pdfBtn.onclick = async () => {
