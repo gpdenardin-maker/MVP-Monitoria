@@ -7,59 +7,151 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Controle Escolar</title>
 <style>
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0f172a;color:#fff}
-.wrap{min-height:100vh;padding:20px}.container{max-width:980px;margin:0 auto}
-.card{background:#111827;padding:20px;border-radius:14px;margin-bottom:18px}
-.card-report{background:#f8fafc;color:#111827;padding:24px;border-radius:14px;margin-bottom:18px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-.label{margin-bottom:6px;opacity:.85;font-size:14px}
-input,select,textarea{width:100%;padding:12px;border-radius:8px;border:none;background:#f8fafc;color:#111827;box-sizing:border-box}
-textarea{min-height:90px}button{padding:12px 16px;border:none;border-radius:8px;font-weight:700;cursor:pointer}
-.green{background:#22c55e;color:#fff}.blue{background:#3b82f6;color:#fff}.gray{background:#1f2937;color:#fff}
-.nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.block{background:#e2e8f0;padding:14px;border-radius:10px;margin-bottom:14px}
-.hidden{display:none!important}.rowitem,.record{background:#1f2937;padding:14px;border-radius:12px;margin-bottom:10px}
-.rowitem{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
-table{width:100%;border-collapse:collapse;background:#fff;color:#000}th,td{border:1px solid #cbd5e1;padding:8px;text-align:left;vertical-align:top}th{background:#e2e8f0}
-img.preview{width:90px;height:90px;object-fit:cover;border-radius:12px;margin-top:14px}
-img.signature{
-  width:220px;
-  height:100px;
-  object-fit:contain;
-  background:#fff;
-  border-radius:12px;
-  padding:8px;
-  margin-top:14px
+:root{
+  --bg:#0b1220;
+  --surface:#111a2e;
+  --surface-2:#182338;
+  --border:#243352;
+  --text:#eef2ff;
+  --text-dim:#9aa5c0;
+  --accent:#22c55e;
+  --accent-2:#3b82f6;
+  --danger:#ef4444;
+  --radius:14px;
+  --radius-sm:10px;
 }
+*{box-sizing:border-box}
+body{margin:0;font-family:'Segoe UI',Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.45}
+.wrap{min-height:100vh;padding:24px}.container{max-width:980px;margin:0 auto}
+
+/* texto nunca deve estourar o layout */
+.card,.card-report,.aluno-card,.record,.rowitem,h1,h2,h3,h4,p,div{overflow-wrap:anywhere;word-break:break-word}
+
+.card{background:var(--surface);padding:22px;border-radius:var(--radius);margin-bottom:18px;border:1px solid var(--border)}
+.card-report{background:#f8fafc;color:#111827;padding:24px;border-radius:var(--radius);margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.label{margin-bottom:6px;opacity:.85;font-size:13px;font-weight:600;letter-spacing:.2px;color:var(--text-dim)}
+
+input,select,textarea{
+  width:100%;padding:11px 12px;border-radius:8px;
+  border:1px solid var(--border);background:#f8fafc;color:#111827;
+  box-sizing:border-box;font-size:14px;transition:border-color .15s,box-shadow .15s;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(59,130,246,.25)}
+textarea{min-height:90px;resize:vertical}
+
+button{padding:11px 18px;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;transition:filter .15s,transform .05s}
+button:hover{filter:brightness(1.08)}
+button:active{transform:translateY(1px)}
+.green{background:var(--accent);color:#06240f}
+.blue{background:var(--accent-2);color:#fff}
+.gray{background:var(--surface-2);color:#fff;border:1px solid var(--border)}
+
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.navbtn{padding:10px 16px}
+.block{background:#e2e8f0;padding:14px;border-radius:var(--radius-sm);margin-bottom:14px}
+.hidden{display:none!important}
+
+.rowitem,.record{background:var(--surface-2);padding:14px;border-radius:var(--radius-sm);margin-bottom:10px;border:1px solid var(--border)}
+.rowitem{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+
+table{width:100%;border-collapse:collapse;background:#fff;color:#000}
+th,td{border:1px solid #cbd5e1;padding:8px;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+th{background:#e2e8f0}
+
+img.preview{width:90px;height:90px;object-fit:cover;border-radius:12px;margin-top:14px}
+img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border-radius:12px;padding:8px;margin-top:14px}
 
 @media print{
   body{background:#fff}
   .print-hide{display:none!important}
 }
 
-/* CARD DO ALUNO */
-.aluno-card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  transition: 0.2s;
+/* ===== CARD DO ALUNO ===== */
+.aluno-card{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  padding:0;
+  overflow:hidden;
+  transition:transform .15s, box-shadow .15s;
+}
+.aluno-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 24px rgba(0,0,0,.35);
 }
 
-.aluno-card:hover {
-  transform: translateY(-3px);
+.aluno-card-media{
+  position:relative;
+  width:100%;
+  height:140px;
+  background:var(--surface-2);
+}
+.aluno-card-media img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.aluno-card-avatar{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:44px;
+  font-weight:700;
+  color:var(--text-dim);
+  background:linear-gradient(135deg,#1f2b45,#141b2c);
+}
+.badge{
+  position:absolute;
+  top:10px; right:10px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.3px;
+}
+.badge-ativo{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(74,222,128,.35)}
+.badge-inativo{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(248,113,113,.35)}
+
+.aluno-card-body{
+  padding:14px 16px 4px;
+  flex:1;
+}
+.aluno-card-nome{
+  font-size:17px;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.aluno-card-escola{
+  margin-top:4px;
+  font-size:13px;
+  color:var(--text-dim);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.aluno-card-meta{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--text-dim);
+  background:var(--surface-2);
+  display:inline-block;
+  padding:3px 8px;
+  border-radius:6px;
 }
 
-.aluno-card img:not(.preview) {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 10px;
+.aluno-card .acoes{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  padding:14px 16px 16px;
 }
-
-.aluno-card .acoes {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.aluno-card .acoes button{flex:1;min-width:100px}
 </style>
 </head>
 <body>
@@ -386,18 +478,24 @@ function preencherAlunoForm(a){state.editandoAlunoId=a.id;a_nome.value=a.nome||"
 
     div.className = "card aluno-card";
 
+    const escolaTxt = a.escola || "Sem escola";
+    const statusBadge = a.ativo
+      ? `<span class="badge badge-ativo">Ativo</span>`
+      : `<span class="badge badge-inativo">Inativo</span>`;
+
     div.innerHTML = `
-      ${a.foto ? `<img src="${a.foto}" class="preview">` : ""}
-
-      <div style="font-size:18px;font-weight:700;margin-top:8px">
-        ${a.nome}
+      <div class="aluno-card-media">
+        ${a.foto ? `<img src="${a.foto}" alt="${a.nome}">` : `<div class="aluno-card-avatar">${(a.nome || "?").trim().charAt(0).toUpperCase()}</div>`}
+        ${statusBadge}
       </div>
 
-      <div style="opacity:.7;font-size:14px">
-        ${a.escola || "Sem escola"}
+      <div class="aluno-card-body">
+        <div class="aluno-card-nome" title="${a.nome}">${a.nome}</div>
+        <div class="aluno-card-escola" title="${escolaTxt}">${escolaTxt}</div>
+        ${a.serie || a.turma ? `<div class="aluno-card-meta">${[a.serie, a.turma].filter(Boolean).join(" • ")}</div>` : ""}
       </div>
 
-      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+      <div class="acoes">
         <button class="blue" onclick="verPerfilAluno('${a.id}')">Ver perfil</button>
         <button class="gray" onclick="editarAlunoDireto('${a.id}')">Editar</button>
       </div>
