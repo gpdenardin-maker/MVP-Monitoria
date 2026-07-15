@@ -189,6 +189,63 @@ img.signature{width:220px;height:100px;object-fit:contain;background:#fff;border
   padding:8px 14px;
   width:100%;
 }
+
+/* ===== PERFIL DO ALUNO ===== */
+.perfil-header{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
+}
+.perfil-foto{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:16px;
+  flex-shrink:0;
+}
+.perfil-avatar{
+  width:88px;
+  height:88px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:34px;
+  font-weight:700;
+  color:var(--text-dim);
+  background:linear-gradient(135deg,#1f2b45,#141b2c);
+  flex-shrink:0;
+}
+.perfil-header-info{flex:1;min-width:180px}
+.perfil-header-topo{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+.perfil-stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:12px;
+}
+.perfil-stat{
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:14px;
+  text-align:center;
+}
+.perfil-stat-valor{font-size:26px;font-weight:700}
+.perfil-stat-label{font-size:12px;color:var(--text-dim);margin-top:2px}
+
+.perfil-info-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:14px 20px;
+}
+.perfil-info-label{
+  font-size:12px;
+  color:var(--text-dim);
+  font-weight:600;
+  margin-bottom:2px;
+}
 </style>
 </head>
 <body>
@@ -431,57 +488,90 @@ function verPerfilAluno(id){
   if(!a) return;
 
   const regs = state.registros.filter(r => r.alunoId === id);
+  const regsOrdenados = [...regs].sort((x,y)=>y.data.localeCompare(x.data));
 
   const total = regs.length;
   const dias = new Set(regs.map(r => r.data)).size;
+  const totalManha = regs.filter(r=>r.turno==="Manhã").length;
+  const totalTarde = regs.filter(r=>r.turno==="Tarde").length;
 
-  const ultimos = [...regs]
-    .sort((a,b)=>b.data.localeCompare(a.data))
-    .slice(0,5);
+  const idade = idadePorData(a.dataNascimento);
+  const statusBadge = a.ativo
+    ? `<span class="badge badge-ativo" style="position:static">Ativo</span>`
+    : `<span class="badge badge-inativo" style="position:static">Inativo</span>`;
 
   const container = document.getElementById("perfilAlunoConteudo");
 
   container.innerHTML = `
+    <button class="gray" onclick="setAba('meus-alunos')" style="margin-bottom:14px">← Voltar para Meus Alunos</button>
+
+    <div class="card perfil-header">
+      ${a.foto
+        ? `<img src="${a.foto}" class="perfil-foto">`
+        : `<div class="perfil-avatar">${(a.nome||"?").trim().charAt(0).toUpperCase()}</div>`}
+      <div class="perfil-header-info">
+        <div class="perfil-header-topo">
+          <h2 style="margin:0">${a.nome}</h2>
+          ${statusBadge}
+        </div>
+        <div style="opacity:.75;margin-top:4px">${[a.escola, a.serie, a.turma].filter(Boolean).join(" • ") || "Sem dados de escola"}</div>
+      </div>
+    </div>
+
     <div class="card">
-
-      <button class="gray" onclick="setAba('meus-alunos')" style="margin-bottom:10px">
-        ← Voltar
-      </button>
-
-      <h3>Perfil do Aluno</h3>
-
-      ${a.foto ? `<img src="${a.foto}" class="preview">` : ""}
-
-      <p><strong>Nome:</strong> ${a.nome}</p>
-      <p><strong>Escola:</strong> ${a.escola || "-"}</p>
-      <p><strong>Série:</strong> ${a.serie || "-"}</p>
-      <p><strong>Turma:</strong> ${a.turma || "-"}</p>
-
-      <div style="margin-top:15px">
-        <h4>Resumo</h4>
-        <p>Total de atendimentos: <strong>${total}</strong></p>
-        <p>Dias atendidos: <strong>${dias}</strong></p>
+      <h4 style="margin-top:0">Resumo de atendimentos</h4>
+      <div class="perfil-stats">
+        <div class="perfil-stat"><div class="perfil-stat-valor">${total}</div><div class="perfil-stat-label">Atendimentos</div></div>
+        <div class="perfil-stat"><div class="perfil-stat-valor">${dias}</div><div class="perfil-stat-label">Dias atendidos</div></div>
+        <div class="perfil-stat"><div class="perfil-stat-valor">${totalManha}</div><div class="perfil-stat-label">Turno manhã</div></div>
+        <div class="perfil-stat"><div class="perfil-stat-valor">${totalTarde}</div><div class="perfil-stat-label">Turno tarde</div></div>
       </div>
+    </div>
 
-      <div style="margin-top:15px">
-        <h4>Últimos atendimentos</h4>
-        ${
-          ultimos.length === 0
-          ? "<p style='opacity:.7'>Nenhum registro.</p>"
-          : ultimos.map(r => `
-              <div style="background:#1f2937;padding:8px;border-radius:8px;margin-bottom:6px">
-                ${formatarData(r.data)} • ${r.turno} • ${r.horario}
-              </div>
-            `).join("")
-        }
+    <div class="card">
+      <h4 style="margin-top:0">Dados do aluno</h4>
+      <div class="perfil-info-grid">
+        <div><div class="perfil-info-label">Escola</div><div>${a.escola || "-"}</div></div>
+        <div><div class="perfil-info-label">Série</div><div>${a.serie || "-"}</div></div>
+        <div><div class="perfil-info-label">Turma</div><div>${a.turma || "-"}</div></div>
+        <div><div class="perfil-info-label">Data de nascimento</div><div>${formatarData(a.dataNascimento) || "-"}${idade ? ` (${idade} anos)` : ""}</div></div>
+        <div><div class="perfil-info-label">Turno padrão</div><div>${a.turnoPadrao || "-"}</div></div>
+        <div><div class="perfil-info-label">Horário padrão</div><div>${a.horarioPadrao || "-"}</div></div>
       </div>
+    </div>
 
-      <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
-        <button class="green" onclick="editarAlunoDireto('${a.id}')">Editar</button>
-        <button class="blue" onclick="irParaLancamento('${a.id}')">Lançar atendimento</button>
-        <button class="gray" onclick="gerarRelatorioDireto('${a.id}')">Relatório</button>
+    <div class="card">
+      <h4 style="margin-top:0">Responsável</h4>
+      <div class="perfil-info-grid">
+        <div><div class="perfil-info-label">Nome</div><div>${a.nomeResponsavel || "-"}</div></div>
+        <div><div class="perfil-info-label">Telefone</div><div>${a.numeroResponsavel || "-"}</div></div>
       </div>
+    </div>
 
+    ${a.observacoesGerais ? `
+    <div class="card">
+      <h4 style="margin-top:0">Observações gerais</h4>
+      <p style="margin:0;opacity:.9">${a.observacoesGerais}</p>
+    </div>` : ""}
+
+    <div class="card">
+      <h4 style="margin-top:0">Histórico de atendimentos</h4>
+      ${
+        regsOrdenados.length === 0
+        ? "<p style='opacity:.7;margin:0'>Nenhum atendimento registrado ainda.</p>"
+        : regsOrdenados.map(r => `
+            <div class="record">
+              <strong>${formatarData(r.data)}</strong> • ${r.turno} • ${r.horario}
+              ${r.observacao ? `<div style="opacity:.75;margin-top:4px">${r.observacao}</div>` : ""}
+            </div>
+          `).join("")
+      }
+    </div>
+
+    <div class="card" style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="green" onclick="editarAlunoDireto('${a.id}')">Editar aluno</button>
+      <button class="blue" onclick="irParaLancamento('${a.id}')">Lançar atendimento</button>
+      <button class="gray" onclick="gerarRelatorioDireto('${a.id}')">Gerar relatório</button>
     </div>
   `;
 
